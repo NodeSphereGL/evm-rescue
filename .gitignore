@@ -1,0 +1,176 @@
+# Environment and configuration
+.env
+.env.local
+.env.development
+.env.production
+!.env.example
+
+# Python virtual environments
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyi
+.Python*
+
+# Development tools and AI assistants
+.sereena/
+.claude/
+.kilocode/
+.opencode/
+mcp.json
+repomix-output.xml
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+*.log.*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+uvicorn.log
+gunicorn.log
+error.log
+access.log
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+test.db
+
+# SSL Certificates (sensitive)
+*.pem
+*.key
+*.crt
+*.csr
+*.p12
+
+# Backup files
+*.bak
+*.backup
+*-backup/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.sublime-*
+.vimrc.local
+*.swp
+*.swo
+*~
+
+# Docker
+.dockerignore
+.dockerignore.tmp
+
+# Deployment automation
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+*.retry
+
+# Dependencies
+node_modules/
+.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases!
+!.yarn/versions!
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Testing and coverage
+.coverage
+htmlcov/
+.tox/
+.pytest_cache/
+.cache/
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+dist-info/
+*.whl
+*.egg
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# celery
+celerybeat-schedule
+celerybeat.pid
+
+# Temporary files
+*.tmp
+*.temp
+*.pid
+*.sock
+
+# AI and ML artifacts
+models/
+*.pkl
+*.joblib
+*.h5
+*.pt
+*.pth
+
+# Monitoring
+monitoring/
+*.prof
+
+# Documentation generation
+site/
+
+# Playwright and testing
+/playwright-report/
+/test-results/
+playwright-report/
+*.trace
+
+# Local development
+local/
+dev/
+
+# AI assistant cache
+.sereena/cache
+
+# Plans and templates (exclude individual plans, but keep templates)
+plans/**/*
+!plans/templates/
+!plans/251107-*
+
+# Screenshots and captures
+screenshots/
+docs/screenshots/
+docs/journals/
+logs.txt
+test-ck
+docs/research/*

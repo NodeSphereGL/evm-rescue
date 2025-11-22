@@ -1,0 +1,47 @@
+{
+  "name": "evm-rescue",
+  "version": "1.0.0",
+  "description": "Rescue ETH from compromised wallets using Flashbots",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:unit": "jest tests/unit",
+    "test:integration": "jest tests/integration --config tests/integration/jest.config.js",
+    "test:sepolia": "cp .env.test .env && npm run test:integration",
+    "test:websocket": "node tests/scripts/test-websocket-simple.js",
+    "test:balance": "node tests/scripts/quick-balance-check.js",
+    "test:validate": "node tests/validation/validate-sepolia.js",
+    "test:all": "node scripts/run-tests.js all",
+    "lint": "eslint src --ext .ts",
+    "type-check": "tsc --noEmit"
+  },
+  "keywords": [
+    "ethereum",
+    "flashbots",
+    "mev",
+    "rescue",
+    "wallet"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@flashbots/ethers-provider-bundle": "^1.0.0",
+    "dotenv": "^16.4.5",
+    "ethers": "6.7.1"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.12",
+    "@types/node": "^22.5.0",
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
+    "eslint": "^8.57.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.4"
+  }
+}

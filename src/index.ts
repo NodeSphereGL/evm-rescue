@@ -2,6 +2,7 @@ import { JsonRpcProvider, Wallet } from 'ethers';
 import { loadConfig, validateConfig } from './config/config';
 import { BalanceMonitor } from './monitors/balance-monitor';
 import { FlashbotsRescue } from './rescue/flashbots-rescue';
+import { TelegramNotifier } from './utils/telegram-notifier';
 import { logger, LogLevel } from './utils/logger';
 
 /**
@@ -9,6 +10,7 @@ import { logger, LogLevel } from './utils/logger';
  */
 class RescueBot {
   private isRescueInProgress = false;
+  private telegramNotifier?: TelegramNotifier;
 
   async run(): Promise<void> {
     try {
@@ -44,6 +46,18 @@ class RescueBot {
 
       await flashbotsRescue.initialize();
 
+      // Initialize Telegram notifications
+      if (config.telegramBotToken && config.telegramChatId) {
+        this.telegramNotifier = new TelegramNotifier(config.telegramBotToken, config.telegramChatId);
+
+        // Test Telegram connection
+        const telegramWorking = await this.telegramNotifier.testConnection();
+        if (!telegramWorking) {
+          logger.warn('Telegram notifications test failed, continuing without notifications');
+          this.telegramNotifier = undefined;
+        }
+      }
+
       // Initialize balance monitor
       const balanceMonitor = new BalanceMonitor(
         provider,
@@ -63,6 +77,16 @@ class RescueBot {
           this.isRescueInProgress = true;
           logger.info('🚨 Balance increase detected! Initiating rescue...');
 
+          // Send rescue started notification
+          if (this.telegramNotifier) {
+            await this.telegramNotifier.sendRescueStarted({
+              success: false,
+              walletAddress: wallet.address,
+              amount: balance,
+              rescueType: 'auto'
+            });
+          }
+
           const result = await flashbotsRescue.executeRescue(balance);
 
           if (result.success) {
@@ -71,11 +95,34 @@ class RescueBot {
             logger.info(`  Block: ${result.blockNumber}`);
             logger.info(`  Amount: ${this.formatEther(result.amountRescued!)} ETH`);
 
+            // Send Telegram notification
+            if (this.telegramNotifier) {
+              await this.telegramNotifier.sendRescueSuccess({
+                success: true,
+                walletAddress: wallet.address,
+                amount: result.amountRescued,
+                txHash: result.txHash,
+                blockNumber: result.blockNumber,
+                rescueType: 'auto'
+              });
+            }
+
             // Stop monitoring after successful rescue
             balanceMonitor.stop();
             process.exit(0);
           } else {
             logger.error(`✗ Rescue failed: ${result.error}`);
+
+            // Send Telegram notification
+            if (this.telegramNotifier) {
+              await this.telegramNotifier.sendRescueFailed({
+                success: false,
+                walletAddress: wallet.address,
+                amount: balance,
+                error: result.error,
+                rescueType: 'auto'
+              });
+            }
           }
         } catch (error) {
           logger.error('Rescue operation error', error);
@@ -89,17 +136,28 @@ class RescueBot {
       await balanceMonitor.startWebSocket(handleBalanceChange);
 
       // Handle graceful shutdown
-      process.on('SIGINT', () => {
+      process.on('SIGINT', async () => {
         logger.info('Received SIGINT, shutting down...');
+        if (this.telegramNotifier) {
+          await this.telegramNotifier.sendBotStopped(wallet.address);
+        }
         balanceMonitor.stop();
         process.exit(0);
       });
 
-      process.on('SIGTERM', () => {
+      process.on('SIGTERM', async () => {
         logger.info('Received SIGTERM, shutting down...');
+        if (this.telegramNotifier) {
+          await this.telegramNotifier.sendBotStopped(wallet.address);
+        }
         balanceMonitor.stop();
         process.exit(0);
       });
+
+      // Send bot started notification
+      if (this.telegramNotifier) {
+        await this.telegramNotifier.sendBotStarted(wallet.address);
+      }
 
       logger.info('Rescue bot is running. Press Ctrl+C to stop.');
     } catch (error) {

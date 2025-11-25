@@ -56,6 +56,15 @@ export function validateConfig(config: Config): void {
     throw new Error('Invalid SAFE_WALLET_ADDRESS: must be a valid Ethereum address');
   }
 
+  // Validate Telegram settings if provided
+  if (config.telegramBotToken && !config.telegramChatId) {
+    throw new Error('TELEGRAM_CHAT_ID is required when TELEGRAM_BOT_TOKEN is provided');
+  }
+
+  if (config.telegramChatId && !config.telegramBotToken) {
+    throw new Error('TELEGRAM_BOT_TOKEN is required when TELEGRAM_CHAT_ID is provided');
+  }
+
   if (config.checkIntervalMs < 1000) {
     throw new Error('CHECK_INTERVAL_MS must be at least 1000ms');
   }
